@@ -23,3 +23,19 @@ def remove_from_db(movie_id): #Remove
     
     cur.execute("DELETE FROM library WHERE id = ?", (movie_id,))
     conn.commit()
+
+
+def get_movie(movie_id): #Read one
+    conn = sql.connect("databases.db")
+    cur = conn.cursor()
+
+    row = cur.execute("SELECT id, title, genre FROM library WHERE id = ?", (movie_id,)).fetchone()
+    return row
+
+
+def update_in_db(movie_id, title, genre): #Update
+    conn = sql.connect("databases.db")
+    cur = conn.cursor()
+
+    cur.execute("UPDATE library SET title = ?, genre = ? WHERE id = ?", (title, genre, movie_id))
+    conn.commit()

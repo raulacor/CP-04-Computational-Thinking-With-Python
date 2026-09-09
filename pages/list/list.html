@@ -11,7 +11,8 @@
     <label>
       <input type="checkbox" name="ids" value="{{ m[0] }}">
       {{ m[1] }} — {{ m[2] }}
-    </label><br>
+    </label>
+    <a href="/edit/{{ m[0] }}">edit</a><br>
         {% else %}
     <p>No movies yet.</p>
         {% endfor %}
