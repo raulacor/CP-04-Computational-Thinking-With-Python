@@ -1,24 +1,292 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Movie</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineFlow — Editar Filme</title>
+
+  <!-- 
+    ============================================================================
+    ESTILOS VISUAIS (ESTILO LETTERBOXD - TELA DE EDIÇÃO)
+    Estilos contidos diretamente na tag <style> para garantir que a página
+    seja servida perfeitamente pelo FastAPI (Jinja2Templates) sem depender de 
+    rotas estáticas no Python.
+    ============================================================================
+  -->
+  <style>
+    :root {
+      --lb-bg: #14181c;             /* Fundo carvão fosco */
+      --lb-card: #1b2228;           /* Superfície escura do card */
+      --lb-border: #2c3440;         /* Borda sutil */
+      --lb-green: #00e054;          /* Verde clássico Letterboxd */
+      --lb-green-hover: #00c030;    /* Verde hover */
+      --lb-text: #ffffff;           /* Texto branco */
+      --lb-text-muted: #899aa9;     /* Texto secundário */
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--lb-bg);
+      color: var(--lb-text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+
+    /* Cabeçalho */
+    .site-header {
+      background-color: var(--lb-bg);
+      border-bottom: 1px solid var(--lb-border);
+      padding: 0.85rem 1.5rem;
+    }
+
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--lb-text);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .brand-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .dot-orange { background-color: #ff8000; }
+    .dot-green  { background-color: var(--lb-green); }
+    .dot-blue   { background-color: #40bcf4; }
+
+    .nav-link {
+      color: var(--lb-text-muted);
+      text-decoration: none;
+      font-size: 0.825rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-link:hover {
+      color: var(--lb-text);
+    }
+
+    /* Card do Formulário */
+    .container {
+      max-width: 480px;
+      width: 100%;
+      margin: 3.5rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+    }
+
+    .card {
+      background-color: var(--lb-card);
+      border: 1px solid var(--lb-border);
+      border-radius: 6px;
+      padding: 2.25rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--lb-border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.075em;
+      color: var(--lb-text-muted);
+    }
+
+    .form-input {
+      background-color: #12161a;
+      border: 1px solid var(--lb-border);
+      border-radius: 4px;
+      padding: 0.65rem 0.85rem;
+      color: var(--lb-text);
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--lb-green);
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1.25rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--lb-border);
+    }
+
+    .btn-cancel {
+      color: var(--lb-text-muted);
+      text-decoration: none;
+      font-size: 0.825rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-cancel:hover {
+      color: var(--lb-text);
+    }
+
+    .btn-submit {
+      background-color: var(--lb-green);
+      color: #14181c;
+      border: none;
+      border-radius: 4px;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.825rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--lb-green-hover);
+    }
+
+    /* Rodapé */
+    .site-footer {
+      border-top: 1px solid var(--lb-border);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--lb-text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
 </head>
 <body>
 
-    <form action="/update-movie" method="POST">
-
-        <div class="input-field">
-            <h2>Edit Movie</h2>
-            <input type="hidden" name="movie_id" value="{{ movie[0] }}">
-            <input type="text" name="title" value="{{ movie[1] }}" placeholder="Title">
-            <input type="text" name="genre" value="{{ movie[2] }}" placeholder="Genre">
-            <button type="submit">Save</button>
+  <!-- ========================================================================
+       CABEÇALHO / NAVEGAÇÃO
+       ======================================================================== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/movies" class="brand">
+        <div class="brand-dots">
+          <span class="dot dot-orange"></span>
+          <span class="dot dot-green"></span>
+          <span class="dot dot-blue"></span>
         </div>
-    </form>
+        <span>CineFlow</span>
+      </a>
 
-    <a href="/movies">Cancel</a>
+      <nav>
+        <a href="/movies" class="nav-link">← Cancelar e Voltar</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       FORMULÁRIO DE EDIÇÃO (UPDATE DO CRUD):
+       100% conectado à rota @router.post("/update-movie") do controller/api.py.
+       O backend passa a variável "movie", onde:
+       - movie[0]: ID do filme (campo hidden para saber qual linha atualizar)
+       - movie[1]: Título atual do filme (preenchido no value)
+       - movie[2]: Gênero atual do filme (preenchido no value)
+       ======================================================================== -->
+  <main class="container">
+    <section class="card">
+      <h1 class="card-title">Editar Filme</h1>
+
+      <form action="/update-movie" method="POST">
+
+        <!-- 
+          ID OCULTO (movie_id):
+          Envia o ID do filme para a cláusula WHERE id = ? no SQLite
+        -->
+        <input type="hidden" name="movie_id" value="{{ movie[0] }}">
+
+        <!-- Campo Título (preenchido com o valor atual) -->
+        <div class="form-group">
+          <label for="title" class="form-label">Título do Filme</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            class="form-input" 
+            value="{{ movie[1] }}" 
+            placeholder="Título do filme" 
+            required 
+            autofocus
+          >
+        </div>
+
+        <!-- Campo Gênero (preenchido com o valor atual) -->
+        <div class="form-group">
+          <label for="genre" class="form-label">Gênero</label>
+          <input 
+            type="text" 
+            id="genre" 
+            name="genre" 
+            class="form-input" 
+            value="{{ movie[2] }}" 
+            placeholder="Gênero do filme" 
+            required
+          >
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <a href="/movies" class="btn-cancel">Cancelar</a>
+          <button type="submit" class="btn-submit">Salvar Alterações</button>
+        </div>
+
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>CineFlow • Desenvolvido para o <strong>CP3 Python (FastAPI + SQLite)</strong></p>
+  </footer>
 
 </body>
 </html>

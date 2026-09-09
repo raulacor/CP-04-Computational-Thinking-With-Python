@@ -1,22 +1,440 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineFlow — Catálogo de Filmes</title>
+
+  <!-- 
+    ============================================================================
+    ESTILOS VISUAIS (ESTILO LETTERBOXD)
+    Optamos por incluir os estilos diretamente na tag <style> para que a página
+    seja exibida com design completo pelo FastAPI (Jinja2Templates) sem a 
+    necessidade de configurar rotas de arquivos estáticos no Python.
+    ============================================================================
+  -->
+  <style>
+    /* 1. Variáveis de Cores inspiradas no Letterboxd */
+    :root {
+      --lb-bg: #14181c;             /* Fundo carvão fosco de cinema */
+      --lb-card: #1b2228;           /* Superfície escura dos cards */
+      --lb-card-hover: #222a32;     /* Destaque sutil no hover */
+      --lb-border: #2c3440;         /* Bordas elegantes */
+      --lb-green: #00e054;          /* Verde icônico do Letterboxd */
+      --lb-green-hover: #00c030;    /* Verde escuro para hover */
+      --lb-red: #ff4b4b;            /* Vermelho para exclusão */
+      --lb-text: #ffffff;           /* Texto branco */
+      --lb-text-muted: #899aa9;     /* Texto secundário cinza-azulado */
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--lb-bg);
+      color: var(--lb-text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+
+    /* 2. Cabeçalho e Barra de Navegação */
+    .site-header {
+      background-color: var(--lb-bg);
+      border-bottom: 1px solid var(--lb-border);
+      padding: 0.85rem 1.5rem;
+    }
+
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--lb-text);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .brand-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .dot-orange { background-color: #ff8000; }
+    .dot-green  { background-color: var(--lb-green); }
+    .dot-blue   { background-color: #40bcf4; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-link {
+      color: var(--lb-text-muted);
+      text-decoration: none;
+      font-size: 0.825rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-link.active {
+      color: var(--lb-text);
+      border-bottom: 2px solid var(--lb-green);
+      padding-bottom: 2px;
+    }
+
+    .btn-add {
+      background-color: var(--lb-green);
+      color: #14181c;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      transition: background-color 0.2s;
+    }
+
+    .btn-add:hover {
+      background-color: var(--lb-green-hover);
+    }
+
+    /* 3. Área de Conteúdo */
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.25rem 1.5rem;
+      flex: 1;
+    }
+
+    .title-bar {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--lb-border);
+      padding-bottom: 0.85rem;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hint-text {
+      font-size: 0.8rem;
+      color: var(--lb-text-muted);
+    }
+
+    /* 4. Grid de Filmes (Pôsteres Verticais 2:3) */
+    .movies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .movie-card {
+      background-color: var(--lb-card);
+      border: 1px solid var(--lb-border);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .movie-card:hover {
+      border-color: var(--lb-green);
+      transform: translateY(-3px);
+    }
+
+    /* Pôster escuro na proporção 2:3 */
+    .poster {
+      aspect-ratio: 2 / 3;
+      background: linear-gradient(180deg, #242c34 0%, #15191e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--lb-border);
+      position: relative;
+    }
+
+    .poster svg {
+      width: 44px;
+      height: 44px;
+      color: #38424d;
+      transition: color 0.2s;
+    }
+
+    .movie-card:hover .poster svg {
+      color: var(--lb-green);
+    }
+
+    /* Checkbox de seleção no canto superior esquerdo */
+    .movie-checkbox {
+      position: absolute;
+      top: 0.65rem;
+      left: 0.65rem;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--lb-green);
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    /* Botão de Editar no canto superior direito do pôster */
+    .btn-edit-badge {
+      position: absolute;
+      top: 0.65rem;
+      right: 0.65rem;
+      background: rgba(20, 24, 28, 0.85);
+      border: 1px solid var(--lb-border);
+      color: var(--lb-text-muted);
+      text-decoration: none;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      z-index: 5;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-edit-badge:hover {
+      color: var(--lb-green);
+      border-color: var(--lb-green);
+    }
+
+    /* Detalhes do filme */
+    .movie-info {
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .movie-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--lb-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .movie-genre {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 0.15rem 0.5rem;
+      background-color: #242c34;
+      color: var(--lb-text-muted);
+      border: 1px solid var(--lb-border);
+      border-radius: 3px;
+      font-size: 0.725rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .stars {
+      color: var(--lb-green);
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+
+    /* 5. Barra de Ações (Exclusão em Lote) */
+    .actions-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--lb-border);
+      padding-top: 1.25rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn-delete {
+      background-color: rgba(255, 75, 75, 0.15);
+      color: var(--lb-red);
+      border: 1px solid rgba(255, 75, 75, 0.4);
+      padding: 0.6rem 1.25rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .btn-delete:hover {
+      background-color: var(--lb-red);
+      color: #ffffff;
+    }
+
+    /* 6. Estado Vazio */
+    .empty-message {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--lb-text-muted);
+    }
+
+    .empty-message p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    /* 7. Rodapé */
+    .site-footer {
+      border-top: 1px solid var(--lb-border);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--lb-text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- ========================================================================
+       CABEÇALHO:
+       Estilo Letterboxd com logo em pontinhos coloridos e navegação clara.
+       ======================================================================== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/movies" class="brand">
+        <div class="brand-dots">
+          <span class="dot dot-orange"></span>
+          <span class="dot dot-green"></span>
+          <span class="dot dot-blue"></span>
+        </div>
+        <span>CineFlow</span>
+      </a>
+
+      <nav class="nav-actions">
+        <a href="/movies" class="nav-link active">Catálogo</a>
+        <a href="/add" class="btn-add">+ Adicionar Filme</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CONTEÚDO PRINCIPAL:
+       Formulário de exclusão que engloba os cards de filmes.
+       Envia uma requisição POST com a lista de IDs para /delete-movies.
+       ======================================================================== -->
+  <main class="container">
+
+    <div class="title-bar">
+      <h1 class="page-title">Biblioteca de Filmes</h1>
+      <span class="hint-text">Marque a caixinha para excluir ou clique em Editar</span>
+    </div>
+
+    <!-- 
+      FORMULÁRIO DE EXCLUSÃO (FastAPI):
+      action="/delete-movies" -> Rota do controller/api.py que recebe ids: list[int]
+      method="POST" -> Método de envio
+    -->
     <form action="/delete-movies" method="POST">
-    {% for m in movies %}
-    <label>
-      <input type="checkbox" name="ids" value="{{ m[0] }}">
-      {{ m[1] }} — {{ m[2] }}
-    </label>
-    <a href="/edit/{{ m[0] }}">edit</a><br>
+
+      <section class="movies-grid">
+
+        <!-- 
+          LOOP JINJA2 (Renderizado no backend em Python):
+          Para cada filme "m" vindo da tabela "library" do SQLite:
+          - m[0]: ID do filme (inteiro)
+          - m[1]: Título do filme (texto)
+          - m[2]: Gênero do filme (texto)
+        -->
+        {% for m in movies %}
+        <article class="movie-card">
+          <div class="poster">
+            <!-- Checkbox que envia o ID do filme se marcado para exclusão -->
+            <input 
+              type="checkbox" 
+              name="ids" 
+              value="{{ m[0] }}" 
+              class="movie-checkbox" 
+              title="Selecionar para excluir"
+            >
+
+            <!-- 
+              LINK DE EDIÇÃO (UPDATE DO CRUD):
+              Leva para a rota /edit/{id} que o backend do amigo criou,
+              abrindo a tela de edição preenchida com os dados atuais.
+            -->
+            <a href="/edit/{{ m[0] }}" class="btn-edit-badge" title="Editar este filme">Editar</a>
+
+            <!-- Arte ilustrativa do pôster no formato clássico de cinema -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+              <line x1="7" y1="2" x2="7" y2="22"/>
+              <line x1="17" y1="2" x2="17" y2="22"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+            </svg>
+          </div>
+
+          <div class="movie-info">
+            <!-- Título do filme renderizado pelo Jinja2 -->
+            <h2 class="movie-title" title="{{ m[1] }}">{{ m[1] }}</h2>
+            
+            <!-- Gênero do filme renderizado pelo Jinja2 -->
+            <span class="movie-genre">{{ m[2] }}</span>
+
+            <!-- Estrelinhas decorativas de avaliação estilo Letterboxd -->
+            <span class="stars">★★★★★</span>
+          </div>
+        </article>
         {% else %}
-    <p>No movies yet.</p>
+        <!-- Exibido automaticamente se a lista de filmes estiver vazia -->
+        <div class="empty-message">
+          <p>Nenhum filme cadastrado na sua biblioteca.</p>
+          <a href="/add" class="btn-add">Cadastrar Primeiro Filme</a>
+        </div>
         {% endfor %}
-  <button type="submit">Delete selected</button>
-</form>
+
+      </section>
+
+      <!-- Rodapé com o botão para envio dos IDs selecionados -->
+      <footer class="actions-footer">
+        <span class="hint-text">Selecione um ou mais filmes e clique para remover.</span>
+        <button type="submit" class="btn-delete">Excluir Selecionados</button>
+      </footer>
+
+    </form>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>CineFlow • Desenvolvido para o <strong>CP3 Python (FastAPI + SQLite)</strong></p>
+  </footer>
+
 </body>
 </html>
