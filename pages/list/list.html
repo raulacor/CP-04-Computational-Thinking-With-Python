@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/delete-movies" method="POST">
+    {% for m in movies %}
+    <label>
+      <input type="checkbox" name="ids" value="{{ m[0] }}">
+      {{ m[1] }} — {{ m[2] }}
+    </label><br>
+        {% else %}
+    <p>No movies yet.</p>
+        {% endfor %}
+  <button type="submit">Delete selected</button>
+</form>
+</body>
+</html>

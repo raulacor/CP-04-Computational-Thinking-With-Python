@@ -1,10 +1,25 @@
 import sqlite3 as sql
 
-
-def add_to_db(title, genre):
+def get_all_movies(): #Read
     conn = sql.connect("databases.db")
     cur = conn.cursor()
 
-    #cur.execute("CREATE TABLE library(title, genre)")
-    cur.execute(f"INSERT INTO library VALUES ('{title}', '{genre}')")
+    rows = cur.execute("SELECT id, title, genre FROM library").fetchall()
+    return rows
+
+
+def add_to_db(title, genre): #Add
+    conn = sql.connect("databases.db")
+    cur = conn.cursor()
+
+    cur.execute("CREATE TABLE IF NOT EXISTS library(id INTEGER PRIMARY KEY, title TEXT, genre TEXT)")
+    cur.execute("INSERT INTO library (title, genre) VALUES (?, ?)", (title, genre))    
+    conn.commit()
+
+
+def remove_from_db(movie_id): #Remove
+    conn = sql.connect("databases.db")
+    cur = conn.cursor()
+    
+    cur.execute("DELETE FROM library WHERE id = ?", (movie_id,))
     conn.commit()
