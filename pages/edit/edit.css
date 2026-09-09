@@ -1,0 +1,192 @@
+/* ==========================================================================
+   CineFlow — Folha de Estilos: Tela de Adicionar Filme (add.css)
+   Padrão visual escuro inspirado no Letterboxd.
+   ========================================================================== */
+
+:root {
+  --lb-bg: #14181c;             /* Fundo carvão fosco */
+  --lb-card: #1b2228;           /* Superfície escura do card */
+  --lb-border: #2c3440;         /* Borda sutil */
+  --lb-green: #00e054;          /* Verde clássico Letterboxd */
+  --lb-green-hover: #00c030;    /* Verde hover */
+  --lb-text: #ffffff;           /* Texto branco */
+  --lb-text-muted: #899aa9;     /* Texto secundário */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--lb-bg);
+  color: var(--lb-text);
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+}
+
+/* Cabeçalho */
+.site-header {
+  background-color: var(--lb-bg);
+  border-bottom: 1px solid var(--lb-border);
+  padding: 0.85rem 1.5rem;
+}
+
+.header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--lb-text);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.brand-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.dot-orange { background-color: #ff8000; }
+.dot-green  { background-color: var(--lb-green); }
+.dot-blue   { background-color: #40bcf4; }
+
+.nav-link {
+  color: var(--lb-text-muted);
+  text-decoration: none;
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav-link:hover {
+  color: var(--lb-text);
+}
+
+/* Card do Formulário */
+.container {
+  max-width: 480px;
+  width: 100%;
+  margin: 3.5rem auto;
+  padding: 0 1.5rem;
+  flex: 1;
+}
+
+.card {
+  background-color: var(--lb-card);
+  border: 1px solid var(--lb-border);
+  border-radius: 6px;
+  padding: 2.25rem;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--lb-border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  color: var(--lb-text-muted);
+}
+
+.form-input {
+  background-color: #12161a;
+  border: 1px solid var(--lb-border);
+  border-radius: 4px;
+  padding: 0.65rem 0.85rem;
+  color: var(--lb-text);
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--lb-green);
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--lb-border);
+}
+
+.btn-cancel {
+  color: var(--lb-text-muted);
+  text-decoration: none;
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-cancel:hover {
+  color: var(--lb-text);
+}
+
+.btn-submit {
+  background-color: var(--lb-green);
+  color: #14181c;
+  border: none;
+  border-radius: 4px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.825rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: var(--lb-green-hover);
+}
+
+/* Rodapé */
+.site-footer {
+  border-top: 1px solid var(--lb-border);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--lb-text-muted);
+  font-size: 0.8rem;
+}
