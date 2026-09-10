@@ -23,8 +23,6 @@ Desenvolvido para a disciplina **Computational Thinking with Python**, o projeto
 - **Update:** Edição de dados de filmes existentes com campos pré-carregados (`/edit/{id}`).
 - **Delete:** Exclusão em lote por caixas de seleção nativas (`/delete-movies`).
 
-> 💡 **Destaque do Front-end:** Interface construída com **HTML5 semântico** e **CSS3 moderno** sem dependência de JavaScript, utilizando renderização server-side via **Jinja2**.
-
 ---
 
 ## 🚀 Como Executar
