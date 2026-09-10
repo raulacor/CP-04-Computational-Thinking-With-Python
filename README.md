@@ -38,27 +38,18 @@ Desenvolvido para a disciplina **Computational Thinking with Python**, o projeto
    cd CP-04-Computational-Thinking-With-Python
    ```
 
-2. **Crie e ative o ambiente virtual:**
-   ```bash
-   python -m venv .venv
-   # No Windows (PowerShell):
-   .venv\Scripts\Activate.ps1
-   # No Linux/macOS:
-   source .venv/bin/activate
-   ```
-
-3. **Instale as dependências:**
+2. **Instale as dependências:**
    ```bash
    pip install fastapi uvicorn jinja2 python-multipart
    ```
 
-4. **Inicie o servidor:**
+3. **Inicie o servidor:**
    ```bash
    cd src
    uvicorn main:app --reload
    ```
 
-5. Acesse no seu navegador:
+4. Acesse no seu navegador:
    👉 **http://127.0.0.1:8000/movies**
 
 ---
