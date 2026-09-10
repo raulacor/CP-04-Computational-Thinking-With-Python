@@ -8,7 +8,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="../pages")
 
 
-@router.get("/movies")
+@router.get("/")
 async def list_movies(request: Request):
     movies = get_all_movies()
     return templates.TemplateResponse(
@@ -28,7 +28,7 @@ async def submit(
 ):
     add_to_db(title=title, genre=genre)
 
-    return rr(status_code=303, url='/movies')
+    return rr(status_code=303, url='/')
     
 
 @router.post("/delete-movies")
@@ -36,7 +36,7 @@ async def submit(ids: list[int] = Form(...)):
     for i in ids:
         remove_from_db(i)
 
-    return rr(status_code=303, url='/movies')
+    return rr(status_code=303, url='/')
 
 
 @router.get("/edit/{movie_id}")
@@ -58,4 +58,4 @@ async def update(
 ):
     update_in_db(movie_id=movie_id, title=title, genre=genre)
 
-    return rr(status_code=303, url='/movies')
+    return rr(status_code=303, url='/')
